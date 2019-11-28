@@ -23,11 +23,13 @@ func (n *node) Next() *node{
   return n.next
 }
 
-func (n *node) Set(next *node){
-  //fmt.Println("Set called:", n.value)
-  first_node := n.next
-  n.next = next
-  next = first_node
+func (l *circularBuffer) Set(new_node *node){
+  head := l.head
+  tail := l.tail
+
+  new_node.next = head
+  tail.next     = new_node
+
 }
 
 func (l *circularBuffer) Length() int{
@@ -40,14 +42,26 @@ func (l *circularBuffer) Push(val interface{}){
   if l.head == nil {
     l.head = n
   }else{
-    l.tail.Set(n)
+    //l.head.Set(n)
+    l.Set(n)
   }
   l.tail = n
   l.length = l.length + 1
-  //l.Print()
+  //fmt.Println("pushing--->", val)
 }
 
 func (l *circularBuffer) Pop(){
+  if l.length ==0{
+    return
+  }
+
+  l.head = l.head.next
+  l.tail.next = l.head
+  l.length = l.length - 1
+  l.Print()
+}
+
+func (l *circularBuffer) Pop1(){
   node := l.head
   if l.Length() == 1 {
     l.head = nil
@@ -58,16 +72,20 @@ func (l *circularBuffer) Pop(){
     node.next = l.head
   }
   l.length = l.length - 1
-  //l.Print()
 }
 
 func (l *circularBuffer) Print() {
+  if l.length ==0{
+    return
+  }
   node := l.head
-  for i:=(l.length-1); i==0; i--{
-    //fmt.Println("****>", i, "<****")
+  fmt.Println("length-->", l.length)
+  //fmt.Println("first_value", node.value)
+  for i:=(l.length-1); i!=0; i--{
     fmt.Printf("%+v ", node.value)
     node = node.next
   }
+  fmt.Println()
 }
 
 func main(){
@@ -81,8 +99,9 @@ func main(){
     l.Push(i)
 
   }
-    l.Print()
+
   fmt.Println("Length of the list: ", l.Length())
+  l.Print()
 
   fmt.Println("Now we Consume:")
 
