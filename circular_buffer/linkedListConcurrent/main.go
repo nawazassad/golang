@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 )
 
 // Creating Struct for Node
@@ -12,6 +13,7 @@ type node struct {
 
 //Creating Struct For link list
 type linkList struct {
+	sync.Mutex
 	length int // will be used for counting the length
 	head   *node
 	tail   *node
@@ -38,7 +40,10 @@ func (l *linkList) Length() int {
 }
 
 // to push a new node  at the end of the link list
-func (l *linkList) Push(val interface{}) {
+func (l *linkList) Push(val interface{}, wg *sync.WaitGroup) {
+	defer wg.Done()
+	l.Lock()
+	defer l.Unlock()
 	n := &node{value: val}
 
 	if l.head == nil {
@@ -48,10 +53,16 @@ func (l *linkList) Push(val interface{}) {
 	}
 	l.tail = n
 	l.length = l.length + 1
+	//fmt.Printf("%+v ", l.Value())
+	l.Print()
+	//l.Unlock()
 }
 
 // this will pop the last element in the link list
-func (l *linkList) Pop() {
+func (l *linkList) Pop(wg *sync.WaitGroup) {
+	defer wg.Done()
+	l.Lock()
+	defer l.Unlock()
 	node := l.head
 	if l.Length() == 1 {
 		l.head = nil
@@ -62,6 +73,7 @@ func (l *linkList) Pop() {
 		node.Set(node.Next().Next())
 	}
 	l.length = l.length - 1
+	l.Print()
 }
 
 // for printing the link list
@@ -77,22 +89,30 @@ func (l *linkList) Print() {
 
 func main() {
 	var l linkList
+	var wg sync.WaitGroup
 	var number int
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
-
+	wg.Add(number)
 	fmt.Println("Now we Produce :")
 	for i := 1; i < number+1; i++ {
-		l.Push(i)
-		l.Print()
+		// for checking if there is race condition we use below go l.Push()
+		//go l.Push(i)
+		go l.Push(i, &wg)
+		//l.Print()
 	}
+	wg.Wait()
 
+	wg.Add(number)
 	fmt.Println("Now we Consume:")
 	l.Print()
 	for k := 1; k < number+1; k++ {
-		l.Pop()
-		l.Print()
+		// for checking if there is race condition we use below go l.Pop()
+		//go l.Pop()
+		go l.Pop(&wg)
+		//l.Print()
 	}
+	wg.Wait()
 	fmt.Println("Linked List is empty ")
 	//l.Print()
 
