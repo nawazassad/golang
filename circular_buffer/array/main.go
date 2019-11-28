@@ -20,17 +20,17 @@ func size(z int) circularArray {
 func (c *circularArray) push(value int) {
 	c.tail = (c.tail + 1) % c.size
 	c.queue[c.tail] = value
-	fmt.Println("moving push index to-->", c.tail)
+	//fmt.Println("moving push index to-->", c.tail)
 }
 
 func (c *circularArray) pop() {
 	if c.head == c.tail {
-		fmt.Println("Nothing to pop at this time")
+		//fmt.Println("Nothing to pop at this time")
 		return
 	}
 	c.head = (c.head + 1) % c.size
 	c.queue[c.head] = 0
-	fmt.Println("moving pop index to-->", c.head)
+	//fmt.Println("moving pop index to-->", c.head)
 }
 
 func main() {

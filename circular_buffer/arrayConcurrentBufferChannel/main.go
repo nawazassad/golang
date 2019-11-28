@@ -40,7 +40,7 @@ func consume(obj *circularArray, i int) {
 
 func main() {
 	obj := size(100000000)
-	var c = make(chan int)
+	var c = make(chan int, 10)
 	start := time.Now()
 	go producer(&obj, c)
 
