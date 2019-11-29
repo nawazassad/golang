@@ -16,14 +16,12 @@ func (c *circularArray) Len() int {
   return len(c.queue)
 }
 
-func size(z int) circularArray {
-	fix_size := make([]int, z)
-	return circularArray{-1, -1, z, fix_size}
-}
-
 func (c *circularArray) push(value int) {
 	c.head = (c.head + 1) % c.size
+  fmt.Println("head--->", c.head)
+  fmt.Println("Queue--->", c.queue)
 	c.queue[c.head] = value
+  c.queue = append(c.queue, value)
 }
 
 func (c *circularArray) pop() {
@@ -52,10 +50,11 @@ func consumer(obj *circularArray, c1, c2 chan string) {
 
 func main() {
   var number int
+  obj := circularArray{head: -1, tail: -1}
   fmt.Println("Enter the number of producers you want: ")
   fmt.Scanf("%d", &number)
 
-	obj := size(number)
+
 	var c1 = make(chan string)
 	var c2 = make(chan string)
 	start := time.Now()
