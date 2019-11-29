@@ -71,7 +71,7 @@ func (node *Node)insert(value int){
 }
 
 
-func (tree *Tree)push(value int){
+func (tree *Tree)Push(value int){
   if tree.Root ==nil{
     tree.Root = &Node{Value: value,}
     return
@@ -157,7 +157,7 @@ func (node *Node)remove(){
   }
 }
 
-func (tree *Tree)pop(){
+func (tree *Tree)Pop(){
   if tree.Root == nil{
     return
   }else if tree.Root.Link[0] == nil && tree.Root.Link[1] == nil{
@@ -170,7 +170,7 @@ func (tree *Tree)pop(){
 func producers(tree *Tree, c1, c2 chan string, number int){
   for i:=1; i< number+1; i++{
     //fmt.Println("Pushgin-->", i)
-    tree.push(i)
+    tree.Push(i)
     c1 <- "pushed"
     <- c2
   }
@@ -178,8 +178,12 @@ func producers(tree *Tree, c1, c2 chan string, number int){
 }
 
 
-func consumers(tree *Tree){
-  tree.pop()
+func consumers(tree *Tree, c1, c2 chan string){
+  for _ = range c1{
+    tree.Pop()
+    c2 <- "consumed"
+  }
+  close(c2)
 }
 
 func main(){
@@ -195,12 +199,15 @@ func main(){
   start := time.Now()
 
   go producers(&tree, c1, c2, number)
+  go consumers(&tree, c1, c2)
+/*
   for _ = range c1{
     consumers(&tree)
     //fmt.Println("Popping")
     c2 <- "consumed"
   }
   close(c2)
+*/
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)

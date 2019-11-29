@@ -54,11 +54,7 @@ func producers(l *LinkedList, c1, c2 chan string, number int){
   close(c1)
 }
 
-func consumers(l *LinkedList){
-  l.Pop()
-}
-
-func new_consumer(l *LinkedList, c1, c2 chan string){
+func consumer(l *LinkedList, c1, c2 chan string){
   for _ = range c1{
     l.Pop()
     c2 <- "consumed"
@@ -78,14 +74,7 @@ func main() {
   start := time.Now()
 
   go producers(&l, c1, c2, number)
-  go new_consumer(&l, c1, c2)
-  /*
-  for _ = range c1{
-    consumers(&l)
-    c2 <- "consumed"
-  }
-  close(c2)
-  */
+  go consumer(&l, c1, c2)
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
