@@ -17,17 +17,16 @@ type LinkedList struct {
 	Tail   *Node
 }
 
-
 // to push a new node  at the end of the link list
 func (l *LinkedList) Push(val interface{}) {
-	n := &Node{Value: val}
+	node := &Node{Value: val}
 
 	if l.Head == nil {
-		l.Head = n
+		l.Head = node
 	} else {
-		l.Tail.Next = n
+		l.Tail.Next = node
 	}
-	l.Tail = n
+	l.Tail = node
 	l.Length = l.Length + 1
 }
 
@@ -40,7 +39,6 @@ func (l *LinkedList) Pop() {
 		for i := 1; i < l.Length-1; i++ {
 			node = node.Next
 		}
-    fmt.Println("popping-->", node.Next)
     node.Next = node.Next.Next
 	}
 	l.Length = l.Length - 1
@@ -53,7 +51,6 @@ func producers(l *LinkedList, number int){
 }
 
 func consumers(l *LinkedList){
-  fmt.Println("--removing")
   for i:=1;i>l.Length+1; i++{
     l.Pop()
   }
@@ -66,7 +63,6 @@ func main() {
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
 
-  fmt.Println("Length--->", l.Length)
   start := time.Now()
 
   producers(&l, number)

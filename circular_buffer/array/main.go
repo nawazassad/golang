@@ -12,11 +12,6 @@ type CircularArray struct {
 	Queue []int
 }
 
-func Size(z int) CircularArray {
-	fix_Size := make([]int, z)
-	return CircularArray{-1, -1, z, fix_Size}
-}
-
 func (c *CircularArray) Push(value int) {
 	c.Tail = (c.Tail + 1) % c.Size
 	c.Queue[c.Tail] = value
@@ -48,7 +43,9 @@ func main() {
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
 
-	obj := Size(number)
+  arr := make([]int, number)
+  var obj = CircularArray{-1, -1, number, arr}
+
 	start := time.Now()
 
   producers(&obj, number)

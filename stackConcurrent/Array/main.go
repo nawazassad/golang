@@ -29,16 +29,10 @@ func (s *stack) Pop(wg *sync.WaitGroup) interface{} {
 	s.Lock()
 	defer s.Unlock()
 	if s.Len() > 0 {
-		//rect := s.data[s.Len()-1]
 		s.data = s.data[:s.Len()-1]
 		fmt.Println(s.data)
-		//return rect
-
 	}
-
 	return nil
-
-	//return fmt.Println("Empty")
 }
 
 func main() {
@@ -47,22 +41,18 @@ func main() {
 	var wg sync.WaitGroup
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
+
 	wg.Add(number)
 	fmt.Println("Now we Produce :")
 	for i := 1; i <= number; i++ {
-
 		go l.Push(i, &wg)
-
 	}
 	wg.Wait()
-	wg.Add(number)
-	fmt.Println("Now we Consume:")
-	//fmt.Println(l)
-	for k := 1; k <= number; k++ {
 
+	wg.Add(number)
+	for k := 1; k <= number; k++ {
 		go l.Pop(&wg)
 		//fmt.Println(l)
-
 		//l.Print()
 	}
 	wg.Wait()

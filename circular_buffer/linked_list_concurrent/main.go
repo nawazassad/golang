@@ -84,13 +84,6 @@ func main(){
 
   go producers(&l, c1, c2, number)
   go consumers(&l, c1, c2)
-  /*
-  for _ = range c1{
-    consumers(&l, number)
-    c2 <- "consumed"
-  }
-  close(c2)
-  */
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)

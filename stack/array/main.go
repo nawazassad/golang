@@ -16,7 +16,6 @@ func (s *Stack) Len() int {
 
 func (s *Stack) Push(value interface{}) {
 	s.Data = append(s.Data, value)
-	//fmt.Println(s.data)
 }
 
 func (s *Stack) Pop() interface{} {

@@ -63,6 +63,5 @@ func main() {
 	go consumer(&obj, c1, c2)
 
 	elapsed := time.Since(start)
-
 	fmt.Println("Time taken is: ", elapsed)
 }

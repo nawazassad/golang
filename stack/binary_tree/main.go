@@ -1,11 +1,14 @@
 package main
 
-//import("fmt")
+import("fmt"
+        "time")
+/*
 import (
   "encoding/json"
   "fmt"
   "log"
 )
+*/
 
 type Tree struct{
   Root *Node
@@ -19,7 +22,7 @@ type Node struct{
 }
 
 func insert_to_left(node *Node, value int){
-  fmt.Println("---1---")
+  //fmt.Println("---1---")
   if node.Link[0] == nil{
     node.Link[0] = &Node{Value: value}
     return
@@ -31,7 +34,7 @@ func insert_to_left(node *Node, value int){
 }
 
 func check_empty_link(node *Node) bool{
-  fmt.Println("---2---", node.Value)
+  //fmt.Println("---2---", node.Value)
   if node.Link[0] == nil || node.Link[1] == nil{
     fmt.Println("Returning True")
     return true
@@ -43,12 +46,12 @@ func check_empty_link(node *Node) bool{
 
 
 func (node *Node)insert(value int){
-  fmt.Println("----Inserting----", node.Value)
+  //fmt.Println("----Inserting----", node.Value)
 
   if node.Link[0] == nil{
     //node.Link[0] = &Node{Value: value, Parent: node}
     node.Link[0] = &Node{Value: value}
-    fmt.Println("----Returning----")
+    //fmt.Println("----Returning----")
     return
   }else if node.Link[1] == nil{
     //node.Link[1] = &Node{Value: value, Parent: node}
@@ -56,13 +59,13 @@ func (node *Node)insert(value int){
     return
   }
 
-  fmt.Println("Before check_empty_link--->1", value, node.Link[0].Value)
+  //fmt.Println("Before check_empty_link--->1", value, node.Link[0].Value)
   if check_empty_link(node.Link[0]){
     node.Link[0].insert(value)
     return
   }
 
-  fmt.Println("Before check_empty_link--->2", value)
+  //fmt.Println("Before check_empty_link--->2", value)
   if check_empty_link(node.Link[1]){
     node.Link[1].insert(value)
     return
@@ -74,33 +77,26 @@ func (node *Node)insert(value int){
 }
 
 
-func (tree *Tree)push(value int){
+func (tree *Tree)Push(value int){
   if tree.Root ==nil{
     tree.Root = &Node{Value: value,}
     return
   }
   tree.Root.insert(value)
-  fmt.Println("**1**")
   //fmt.Println(tree.Root.Link[0].Value)
-  fmt.Println("**2**")
   return
 }
 
 func check_for_single_child(node *Node)bool{
-  fmt.Println("--->NODE-->1", node.Value)
 
   if node.Link[0] == nil{
   }else{
     check_for_single_child(node.Link[0])
-    fmt.Println("--->NODE-->2", (*node).Value)
   }
 
   if node.Link[1] == nil{
     if node.Link[0] != nil{
-      fmt.Println("found a single value-->", node.Value)
-      fmt.Println("found a single value-->", node)
       node.Link[0] = nil
-      fmt.Println("found a single value-->", node)
       return true
     }
   }else{
@@ -110,10 +106,10 @@ func check_for_single_child(node *Node)bool{
 }
 
 func check_for_single_child1(node *Node)bool{
-  fmt.Println("Value: ", node.Value, "Left: ") //, node.Link[0].Value, node.Link[1].Value)
-  fmt.Println("Value:-->", node.Link[0])
+  //fmt.Println("Value: ", node.Value, "Left: ") //, node.Link[0].Value, node.Link[1].Value)
+  //fmt.Println("Value:-->", node.Link[0])
   if node.Link[0] == nil{
-    fmt.Println("Returning false")
+    //fmt.Println("Returning false")
     return false
   }else if node.Link[1] == nil{
     return true
@@ -181,15 +177,44 @@ func (node *Node)remove(){
   }
 }
 
-func (tree *Tree)pop(){
+func (tree *Tree)Pop(){
   if tree.Root == nil{
+    return
+  } else if tree.Root.Link[0] == nil && tree.Root.Link[1] == nil{
+    tree.Root = nil
     return
   }
   tree.Root.remove()
 }
 
+func producers(tree *Tree, number int){
+  for i:=1; i<number+1; i++{
+    tree.Push(i)
+  }
+}
+
+func consumers(tree *Tree, number int){
+  for i:=1; i<number+1; i++{
+    tree.Pop()
+  }
+}
+
 func main(){
   tree := Tree{}
+  var number int
+  fmt.Println("Enter the number of producers you want: ")
+  fmt.Scanf("%d", &number)
+
+  start := time.Now()
+
+  producers(&tree, number)
+  consumers(&tree, number)
+
+  elapsed := time.Since(start)
+  fmt.Println("Time taken is: ", elapsed)
+
+}
+/*
   tree.push(1)
   tree.push(2)
   tree.push(3)
@@ -216,3 +241,4 @@ func main(){
   }
   fmt.Printf("%s\n", data)
 }
+*/

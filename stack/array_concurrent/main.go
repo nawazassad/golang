@@ -18,17 +18,13 @@ func (s *Stack) Push(value interface{}) {
 	s.Data = append(s.Data, value)
 }
 
-func (s *Stack) Pop() interface{} {
+func (s *Stack) Pop() {
 	if s.Len() > 0 {
-		rect := s.Data[s.Len()-1]
 		s.Data = s.Data[:s.Len()-1]
-		return rect
 	}
-	return nil
 }
 
 func producer(s *Stack, c1, c2 chan string){
-
   for i:=1; i<s.Size+1; i++{
     s.Push(i)
     fmt.Println("pushing data-->", i)
@@ -41,8 +37,10 @@ func producer(s *Stack, c1, c2 chan string){
 func consumer(s *Stack, c1, c2 chan string){
   for _ = range c1{
     s.Pop()
+    fmt.Println("Consumed data-->")
     c2 <- "consumed"
   }
+  close(c2)
 }
 
 func main() {
@@ -58,12 +56,6 @@ func main() {
 
   go producer(&s, c1, c2)
   go consumer(&s, c1, c2)
-/*
-  for msg := range c{
-    fmt.Println("Popping", msg)
-    consumer(&s)
-  }
-*/
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
