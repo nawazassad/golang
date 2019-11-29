@@ -5,47 +5,57 @@ import (
   "time"
 )
 
-type stack struct {
-	data []interface{}
+type Stack struct {
+	Data []interface{}
+  Size int
 }
 
-func (s *stack) Len() int {
-	return len(s.data)
+func (s *Stack) Len() int {
+	return len(s.Data)
 }
 
-func (s *stack) Push(value interface{}) {
-	s.data = append(s.data, value)
+func (s *Stack) Push(value interface{}) {
+	s.Data = append(s.Data, value)
 	//fmt.Println(s.data)
 }
 
-func (s *stack) Pop() interface{} {
+func (s *Stack) Pop() interface{} {
 	if s.Len() > 0 {
-		rect := s.data[s.Len()-1]
-		s.data = s.data[:s.Len()-1]
+		rect := s.Data[s.Len()-1]
+		s.Data = s.Data[:s.Len()-1]
 		return rect
 	}
 	return nil
 }
 
+func producer(s *Stack, c chan int){
+
+  for i:=1; i<s.Size+1; i++{
+    s.Push(i)
+    c <- i
+  }
+  close(c)
+}
+
+func consumer(s *Stack){
+  s.Pop()
+}
+
 func main() {
-	var l stack
-	var number int
+	var s Stack
+  var c = make(chan int)
 
 	fmt.Println("Enter the number of producers you want: ")
-	fmt.Scanf("%d", &number)
+	fmt.Scanf("%d", &s.Size)
 
 	fmt.Println("Now we Produce :")
   start := time.Now()
-	for i := 1; i < number+1; i++ {
-		l.Push(i)
-	}
-	//fmt.Println("Now we Consume:")
-	//fmt.Println(l)
-	for k := 1; k < number+1; k++ {
-		l.Pop()
-		//fmt.Println(l.data)
 
-	}
+  go producer(&s, c)
+  for _ = range c{
+    consumer(&s)
+  }
+
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
 }
