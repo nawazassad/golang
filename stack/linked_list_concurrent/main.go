@@ -7,7 +7,7 @@ import (
 
 type Node struct {
 	Next  *Node
-	Value interface{}
+	Value int
 }
 
 //Creating Struct For link list
@@ -19,13 +19,14 @@ type LinkedList struct {
 
 
 // to push a new node  at the end of the link list
-func (l *LinkedList) Push(val interface{}) {
+func (l *LinkedList) Push(val int, c chan int) {
 	n := &Node{Value: val}
-
 	if l.Head == nil {
 		l.Head = n
+    c <- val
 	} else {
 		l.Tail.Next = n
+    c <- val
 	}
 	l.Tail = n
 	l.Length = l.Length + 1
@@ -38,39 +39,43 @@ func (l *LinkedList) Pop() {
 		l.Head = nil
 	} else {
 		for i := 1; i < l.Length-1; i++ {
+      fmt.Println(node.Value)
 			node = node.Next
 		}
-    fmt.Println("popping-->", node.Next)
     node.Next = node.Next.Next
 	}
 	l.Length = l.Length - 1
 }
 
-func producers(l *LinkedList, number int){
-  for i:=1; i< number+1 ;i++{
-    l.Push(i)
+
+func producers(l *LinkedList, c chan int){
+  for i:=1; i<l.Length+1;i++{
+    l.Push(i, c)
+    fmt.Println("pushing-->", i)
   }
+  close(c)
 }
 
 func consumers(l *LinkedList){
-  fmt.Println("--removing")
-  for i:=1;i>l.Length+1; i++{
-    l.Pop()
-  }
+  l.Pop()
 }
 
 func main() {
 	var l LinkedList
-  var number int
+  var c1 = make(chan int, 4)
+  var c2 = make(chan int, 4)
 
 	fmt.Println("Enter the number of producers you want: ")
-	fmt.Scanf("%d", &number)
+	fmt.Scanf("%d", &l.Length)
 
-  fmt.Println("Length--->", l.Length)
+
   start := time.Now()
 
-  producers(&l, number)
-  consumers(&l)
+  go producers(&l, c)
+  for msg := range c{
+    fmt.Println("popping-->", msg)
+    consumers(&l)
+  }
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)

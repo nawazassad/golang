@@ -40,37 +40,41 @@ func (l *LinkedList) Pop() {
 		for i := 1; i < l.Length-1; i++ {
 			node = node.Next
 		}
-    fmt.Println("popping-->", node.Next)
     node.Next = node.Next.Next
 	}
 	l.Length = l.Length - 1
 }
 
-func producers(l *LinkedList, number int){
+func producers(l *LinkedList, c1, c2 chan string, number int){
   for i:=1; i< number+1 ;i++{
     l.Push(i)
+    c1 <- "produced"
+    <-c2
   }
+  close(c1)
 }
 
 func consumers(l *LinkedList){
-  fmt.Println("--removing")
-  for i:=1;i>l.Length+1; i++{
-    l.Pop()
-  }
+  l.Pop()
 }
 
 func main() {
 	var l LinkedList
   var number int
+  var c1 = make(chan string, 10)
+  var c2 = make(chan string, 10)
 
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
 
-  fmt.Println("Length--->", l.Length)
   start := time.Now()
 
-  producers(&l, number)
-  consumers(&l)
+  go producers(&l, c1, c2, number)
+  for _ = range c1{
+    consumers(&l)
+    c2 <- "consumed"
+  }
+  close(c2)
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)

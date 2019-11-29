@@ -16,7 +16,6 @@ func (s *Stack) Len() int {
 
 func (s *Stack) Push(value interface{}) {
 	s.Data = append(s.Data, value)
-	//fmt.Println(s.data)
 }
 
 func (s *Stack) Pop() interface{} {
@@ -32,12 +31,14 @@ func producer(s *Stack, c chan int){
 
   for i:=1; i<s.Size+1; i++{
     s.Push(i)
+    fmt.Println("pushing data-->", i)
     c <- i
   }
   close(c)
 }
 
 func consumer(s *Stack){
+
   s.Pop()
 }
 
@@ -52,7 +53,8 @@ func main() {
   start := time.Now()
 
   go producer(&s, c)
-  for _ = range c{
+  for msg := range c{
+    fmt.Println("Popping", msg)
     consumer(&s)
   }
 
