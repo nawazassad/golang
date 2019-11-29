@@ -27,24 +27,28 @@ func (s *Stack) Pop() interface{} {
 	return nil
 }
 
-func producer(s *Stack, c chan int){
+func producer(s *Stack, c1, c2 chan string){
 
   for i:=1; i<s.Size+1; i++{
     s.Push(i)
     fmt.Println("pushing data-->", i)
-    c <- i
+    c1 <- "produced"
+    <-c2
   }
-  close(c)
+  close(c1)
 }
 
-func consumer(s *Stack){
-
-  s.Pop()
+func consumer(s *Stack, c1, c2 chan string){
+  for _ = range c1{
+    s.Pop()
+    c2 <- "consumed"
+  }
 }
 
 func main() {
 	var s Stack
-  var c = make(chan int)
+  var c1 = make(chan string)
+  var c2 = make(chan string)
 
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &s.Size)
@@ -52,11 +56,14 @@ func main() {
 	fmt.Println("Now we Produce :")
   start := time.Now()
 
-  go producer(&s, c)
+  go producer(&s, c1, c2)
+  go consumer(&s, c1, c2)
+/*
   for msg := range c{
     fmt.Println("Popping", msg)
     consumer(&s)
   }
+*/
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
