@@ -12,6 +12,10 @@ type circularArray struct {
 	queue []int
 }
 
+func (c *circularArray) Len() int {
+  return len(c.queue)
+}
+
 func size(z int) circularArray {
 	fix_size := make([]int, z)
 	return circularArray{-1, -1, z, fix_size}
@@ -22,20 +26,28 @@ func (c *circularArray) push(value int) {
 	c.queue[c.head] = value
 }
 
-func (c *circularArray) pop(index int) {
-	c.queue[index] = 0
+func (c *circularArray) pop() {
+  if c.Len() >0{
+    c.queue = c.queue[:c.Len()-1]
+  }
+  return
 }
 
-func producer(obj *circularArray, c chan int) {
+func producer(obj *circularArray, c1, c2 chan string) {
 	for i := 0; i < obj.size; i++ {
 		obj.push(i)
-		c <- (i)
+		c1 <- "produced"
+    <- c2
 	}
-	close(c)
+	close(c1)
 }
 
-func consume(obj *circularArray, i int) {
-	obj.pop(i)
+func consumer(obj *circularArray, c1, c2 chan string) {
+  for _ = range c1{
+    obj.pop()
+    c2 <- "consumed"
+  }
+  close(c2)
 }
 
 func main() {
@@ -44,14 +56,12 @@ func main() {
   fmt.Scanf("%d", &number)
 
 	obj := size(number)
-	var c = make(chan int)
+	var c1 = make(chan string)
+	var c2 = make(chan string)
 	start := time.Now()
-	go producer(&obj, c)
+	go producer(&obj, c1, c2)
+	go consumer(&obj, c1, c2)
 
-	for msg := range c {
-		//fmt.Println("Popping---->", msg)
-		consume(&obj, msg)
-	}
 	elapsed := time.Since(start)
 
 	fmt.Println("Time taken is: ", elapsed)

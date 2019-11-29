@@ -56,7 +56,15 @@ func producers(cb *CircularBuffer, c1, c2 chan string, number int){
   close(c1)
 }
 
-func consumers(cb *CircularBuffer, number int){
+func consumers(cb *CircularBuffer, c1, c2 chan string){
+  for _ = range c1{
+    cb.Pop()
+    c2 <- "consumed"
+  }
+  close(c2)
+}
+
+func consumers1(cb *CircularBuffer, number int){
   for i:=0; i<number+1; i++{
     cb.Pop()
   }
@@ -75,11 +83,14 @@ func main(){
   start := time.Now()
 
   go producers(&l, c1, c2, number)
+  go consumers(&l, c1, c2)
+  /*
   for _ = range c1{
     consumers(&l, number)
     c2 <- "consumed"
   }
   close(c2)
+  */
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
