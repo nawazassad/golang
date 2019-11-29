@@ -5,67 +5,56 @@ import (
 	"time"
 )
 
-type circularArray struct {
-	head  int
-	tail  int
-	size  int
-	queue []int
+type CircularArray struct {
+	Head  int
+	Tail  int
+	Size  int
+	Queue []int
 }
 
-func size(z int) circularArray {
-	fix_size := make([]int, z)
-	return circularArray{-1, -1, z, fix_size}
+func Size(z int) CircularArray {
+	fix_Size := make([]int, z)
+	return CircularArray{-1, -1, z, fix_Size}
 }
 
-func (c *circularArray) push(value int) {
-	c.tail = (c.tail + 1) % c.size
-	c.queue[c.tail] = value
-	//fmt.Println("moving push index to-->", c.tail)
+func (c *CircularArray) Push(value int) {
+	c.Tail = (c.Tail + 1) % c.Size
+	c.Queue[c.Tail] = value
 }
 
-func (c *circularArray) pop() {
-	if c.head == c.tail {
-		//fmt.Println("Nothing to pop at this time")
+func (c *CircularArray) Pop() {
+	if c.Head == c.Tail {
 		return
 	}
-	c.head = (c.head + 1) % c.size
-	c.queue[c.head] = 0
-	//fmt.Println("moving pop index to-->", c.head)
+	c.Head = (c.Head + 1) % c.Size
+	c.Queue[c.Head] = 0
+}
+
+
+func producers(ca *CircularArray, number int){
+  for i:=1; i<number+1; i++{
+    ca.Push(i)
+  }
+}
+
+func consumers(ca *CircularArray, number int){
+  for i:=1; i<number+1; i++{
+    ca.Push(i)
+  }
 }
 
 func main() {
 	var number int
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
-	obj := size(number)
-	start := time.Now()
-	for i := 1; i <= number; i++ {
-		// for checking if there is race condition we use below go l.Push()
-		//go l.Push(i)
-		obj.push(i)
-		//fmt.Println(obj)
-		//l.Print()
-	}
 
-	for k := 1; k <= number; k++ {
-		// for checking if there is race condition we use below go l.Pop()
-		//go l.Pop()
-		obj.pop()
-		//fmt.Println(obj)
-		//l.Print()
-	}
+	obj := Size(number)
+	start := time.Now()
+
+  producers(&obj, number)
+  consumers(&obj, number)
+
 	elapsed := time.Since(start)
 
 	fmt.Println("Time taken is: ", elapsed)
-	// obj.push(1)
-	// obj.push(2)
-	// obj.push(3)
-
-	// fmt.Println(obj)
-	// obj.pop()
-	// obj.pop()
-	// fmt.Println(obj)
-	// obj.pop()
-	// obj.pop()
-	// fmt.Println(obj)
 }

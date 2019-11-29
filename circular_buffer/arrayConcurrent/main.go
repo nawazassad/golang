@@ -39,7 +39,11 @@ func consume(obj *circularArray, i int) {
 }
 
 func main() {
-	obj := size(100000000)
+  var number int
+  fmt.Println("Enter the number of producers you want: ")
+  fmt.Scanf("%d", &number)
+
+	obj := size(number)
 	var c = make(chan int)
 	start := time.Now()
 	go producer(&obj, c)
