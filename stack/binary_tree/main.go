@@ -1,14 +1,10 @@
 package main
 
 import("fmt"
-        "time")
-/*
-import (
-  "encoding/json"
-  "fmt"
-  "log"
+        "time"
+        "encoding/json"
+        "log"
 )
-*/
 
 type Tree struct{
   Root *Node
@@ -36,14 +32,11 @@ func insert_to_left(node *Node, value int){
 func check_empty_link(node *Node) bool{
   //fmt.Println("---2---", node.Value)
   if node.Link[0] == nil || node.Link[1] == nil{
-    fmt.Println("Returning True")
+    //fmt.Println("Returning True")
     return true
   }
   return false
 }
-
-
-
 
 func (node *Node)insert(value int){
   //fmt.Println("----Inserting----", node.Value)
@@ -96,23 +89,15 @@ func check_for_single_child(node *Node)bool{
 
   if node.Link[1] == nil{
     if node.Link[0] != nil{
+      //fmt.Println("Found Single element--->", node.Link[0].Value)
+      //fmt.Println("Found Single element--->", node)
+      //fmt.Println("Popping element-------->", node.Link[0].Value)
       node.Link[0] = nil
+      //fmt.Println("Found Single element--->", node)
       return true
     }
   }else{
     check_for_single_child(node.Link[1])
-  }
-  return false
-}
-
-func check_for_single_child1(node *Node)bool{
-  //fmt.Println("Value: ", node.Value, "Left: ") //, node.Link[0].Value, node.Link[1].Value)
-  //fmt.Println("Value:-->", node.Link[0])
-  if node.Link[0] == nil{
-    //fmt.Println("Returning false")
-    return false
-  }else if node.Link[1] == nil{
-    return true
   }
   return false
 }
@@ -138,8 +123,10 @@ func depth_of_right_nodes(node *Node, right_depth int)(*Node, int){
 func remove_last_node(node *Node, last_node *Node){
 
   if node.Link[1] == last_node{
-    fmt.Println("Popping element--->", node.Link[1].Value)
+    //fmt.Println("Popping element--->", node.Link[1].Value)
+    //fmt.Println("Popping element--->", node)
     node.Link[1] = nil
+    //fmt.Println("Popping element--->", node)
     return
   }else{
     remove_last_node(node.Link[1], last_node)
@@ -151,23 +138,23 @@ func remove_last_node(node *Node, last_node *Node){
 
 func (node *Node)remove(){
 
-  fmt.Println("checking for signle child--->", node.Link[0].Value)
-  fmt.Println("*******************1**********************", node.Value)
+  //fmt.Println("checking for signle child--->", node.Link[0].Value)
+  //fmt.Println("*******************1**********************", node.Value)
   if check_for_single_child(node.Link[0]){
     return
   }
 
-  fmt.Println("*******************2**********************", node.Value)
-  fmt.Println("*******************2**********************", node)
+  //fmt.Println("*******************2**********************", node.Value)
+  //fmt.Println("*******************2**********************", node)
   if check_for_single_child(node.Link[1]){
     return
   }
-  fmt.Println("value--->", node.Value)
+  //fmt.Println("value--->", node.Value)
   last_left_node, left_depth   := depth_of_left_nodes(node.Link[0], 0)
   last_right_node, right_depth := depth_of_right_nodes(node.Link[1], 0)
 
-  fmt.Println("Last_LeftNOde-->", last_left_node.Value)
-  fmt.Println("Last_RightNOde-->", last_right_node.Value)
+  //fmt.Println("Last_LeftNOde-->", last_left_node.Value)
+  //fmt.Println("Last_RightNOde-->", last_right_node.Value)
 
 
   if left_depth > right_depth{
@@ -178,12 +165,35 @@ func (node *Node)remove(){
 }
 
 func (tree *Tree)Pop(){
+  //fmt.Println("---1---")
   if tree.Root == nil{
+    //fmt.Println("---2---")
     return
-  } else if tree.Root.Link[0] == nil && tree.Root.Link[1] == nil{
+  } else if tree.Root.Link[0] == nil{ 
+    //fmt.Println("---3---")
     tree.Root = nil
     return
+  } else if tree.Root.Link[1] == nil && tree.Root.Link[0] != nil{
+    tree.Root.Link[0] = nil
+    return
   }
+  _, left_depth := depth_of_left_nodes(tree.Root.Link[0], 0)
+
+
+  //fmt.Println("*****************************************************>", left_depth, right_depth)
+  //fmt.Println("*****************************************************>", tree.Root.Value, tree.Root.Link[0].Value)
+
+  if left_depth == 0{
+    //fmt.Println("When depth is zeroooo")
+    if tree.Root.Link[1] != nil{
+      tree.Root.Link[1] = nil
+      return
+    }else{
+      tree.Root.Link[0] = nil
+      return
+    }
+  }
+  //fmt.Println("---4---")
   tree.Root.remove()
 }
 
@@ -201,6 +211,7 @@ func consumers(tree *Tree, number int){
 
 func main(){
   tree := Tree{}
+
   var number int
   fmt.Println("Enter the number of producers you want: ")
   fmt.Scanf("%d", &number)
@@ -208,6 +219,12 @@ func main(){
   start := time.Now()
 
   producers(&tree, number)
+  data, err := json.MarshalIndent(tree, "", "  ")
+  //fmt.Println("***Pavilion***")
+  if err != nil {
+    log.Fatal(err)
+  }
+  fmt.Printf("%s\n", data)
   consumers(&tree, number)
 
   elapsed := time.Since(start)
@@ -215,13 +232,14 @@ func main(){
 
 }
 /*
-  tree.push(1)
-  tree.push(2)
-  tree.push(3)
-  tree.push(4)
-  tree.push(5)
-  tree.push(6)
-  tree.push(7)
+  start := time.Now()
+  tree.Push(1)
+  tree.Push(2)
+  tree.Push(3)
+  //tree.Push(4)
+  //tree.Push(5)
+  //tree.Push(6)
+  //tree.Push(7)
   //tree.push(8)
   fmt.Println("***Pavilion***")
   data, err := json.MarshalIndent(tree, "", "  ")
@@ -231,7 +249,9 @@ func main(){
   }
   fmt.Printf("%s\n", data)
 
-  tree.pop()
+  tree.Pop()
+  tree.Pop()
+  tree.Pop()
 
 
   data, err = json.MarshalIndent(tree, "", "  ")
@@ -240,5 +260,8 @@ func main(){
     log.Fatal(err)
   }
   fmt.Printf("%s\n", data)
+  elapsed := time.Since(start)
+  fmt.Println("Time taken is: ", elapsed)
 }
+
 */
