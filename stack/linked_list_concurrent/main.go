@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
   "time"
+  "sync"
 )
 
 type Node struct {
@@ -45,11 +46,13 @@ func (l *LinkedList) Pop() {
 	l.Length = l.Length - 1
 }
 
-func producers(l *LinkedList, c1, c2 chan string, number int){
+func producers(l *LinkedList, c1, c2 chan string, number int, wg *sync.WaitGroup){
   for i:=1; i< number+1 ;i++{
+    
     l.Push(i)
     c1 <- "produced"
     <-c2
+    wg.Done()
   }
   close(c1)
 }
@@ -71,11 +74,15 @@ func main() {
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
 
+  var wg sync.WaitGroup
+
+  wg.Add(number)
   start := time.Now()
 
-  go producers(&l, c1, c2, number)
+  go producers(&l, c1, c2, number, &wg)
   go consumer(&l, c1, c2)
 
+  wg.Wait()
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
 }

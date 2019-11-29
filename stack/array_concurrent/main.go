@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
   "time"
+  "sync"
 )
 
 type Stack struct {
@@ -24,39 +25,39 @@ func (s *Stack) Pop() {
 	}
 }
 
-func producer(s *Stack, c1, c2 chan string){
-  for i:=1; i<s.Size+1; i++{
+func producer(s *Stack, c1 chan string, number int, wg *sync.WaitGroup){
+  for i:=1; i<number+1; i++{
     s.Push(i)
-    fmt.Println("pushing data-->", i)
     c1 <- "produced"
-    <-c2
+    wg.Done()
   }
   close(c1)
 }
 
-func consumer(s *Stack, c1, c2 chan string){
-  for _ = range c1{
-    s.Pop()
-    fmt.Println("Consumed data-->")
-    c2 <- "consumed"
-  }
-  close(c2)
+func consumer(s *Stack){
+  s.Pop()
 }
 
 func main() {
 	var s Stack
+  var number int
   var c1 = make(chan string)
-  var c2 = make(chan string)
+  //var c2 = make(chan string)
 
 	fmt.Println("Enter the number of producers you want: ")
-	fmt.Scanf("%d", &s.Size)
+	fmt.Scanf("%d", &number)
+
+  var wg sync.WaitGroup
+  wg.Add(number)
 
 	fmt.Println("Now we Produce :")
   start := time.Now()
 
-  go producer(&s, c1, c2)
-  go consumer(&s, c1, c2)
-
+  go producer(&s, c1, number, &wg)
+  for _ =range c1{
+    consumer(&s)
+  }
+  wg.Wait()
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
 }
