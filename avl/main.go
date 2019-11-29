@@ -171,9 +171,85 @@ func print_tree(t *Avl){
   return
 }
 
+//***removing***
+func check_for_single_child(node *Avl)bool{
+  fmt.Println("--->NODE-->1", node.data)
 
+  if node.l_child == nil{
+  }else{
+    check_for_single_child(node.l_child)
+    fmt.Println("--->NODE-->2", (*node).data)
+  }
+
+  if node.r_child == nil{
+    if node.l_child != nil{
+      fmt.Println("found a single value-->", node.data)
+      fmt.Println("found a single value-->", node)
+      node.l_child = nil
+      fmt.Println("found a single value-->", node)
+      return true
+    }
+  }else{
+    check_for_single_child(node.r_child)
+  }
+  return false
+}
+
+func depth_of_left_nodes(node *Avl, left_depth int)(*Avl, int){
+  if node.r_child ==nil{
+    return node, left_depth
+  }else{
+    last_node, count := depth_of_left_nodes(node.r_child, left_depth+1)
+    return last_node, count
+  }
+}
+
+func depth_of_right_nodes(node *Avl, right_depth int)(*Avl, int){
+  if node.r_child ==nil{
+    return node, right_depth
+  }else{
+    last_node, count := depth_of_right_nodes(node.r_child, right_depth+1)
+    return last_node, count
+  }
+}
+
+func remove_last_node(node *Avl, last_node *Avl){
+
+  if node.r_child == last_node{
+    fmt.Println("Popping element--->", node.r_child.data)
+    node.r_child = nil
+    return
+  }else{
+    remove_last_node(node.r_child, last_node)
+    return
+  }
+}
+
+func remove(node *Avl){
+  if check_for_single_child(node.l_child){
+    return
+  }
+
+  if check_for_single_child(node.r_child){
+    return
+  }
+
+  last_left_node, left_depth   := depth_of_left_nodes(node.l_child, 0)
+  last_right_node, right_depth := depth_of_right_nodes(node.r_child, 0)
+
+  fmt.Println("Last_LeftNOde-->", last_left_node.data)
+  fmt.Println("Last_RightNOde-->", last_right_node.data)
+
+
+  if left_depth > right_depth{
+    remove_last_node(node.l_child, last_left_node)
+  }else{
+    remove_last_node(node.r_child, last_right_node)
+  }
+
+}
 // expected output--> 11, 23, 29, 26, 20, 50, 65, 55, 41
-/* left rotate example
+///* left rotate example
 func main(){
   var a = Avl{data: 41}
   insert(&a, 20)
@@ -185,8 +261,10 @@ func main(){
   insert(&a, 26)
   insert(&a, 23)
   print_tree(&a)
+  remove(&a)
+  print_tree(&a)
 }
-*/
+//*/
 
 // expected output--> 20, 55, 70, 65, 41
 /* right rotate example
