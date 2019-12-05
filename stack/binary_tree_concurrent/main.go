@@ -209,12 +209,13 @@ func producers(tree *Tree, c1, c2 chan string, number int){
 }
 
 
-func consumers(tree *Tree, c1, c2 chan string){
+func consumers(tree *Tree, c1, c2, c3 chan string){
   for _ = range c1{
     tree.Pop()
     c2 <- "consumed"
   }
   close(c2)
+  c3 <- "completed"
 }
 
 
@@ -223,6 +224,7 @@ func main(){
   var number int
   var c1 = make(chan string)
   var c2 = make(chan string)
+  var c3 = make(chan string)
 
   fmt.Println("Enter the number of producers you want: ")
   fmt.Scanf("%d", &number)
@@ -230,7 +232,8 @@ func main(){
   start := time.Now()
 
   go producers(&tree, c1, c2, number)
-  go consumers(&tree, c1, c2)
+  go consumers(&tree, c1, c2, c3)
+  <- c3
   data, err := json.MarshalIndent(tree, "", "  ")
   //fmt.Println("***Pavilion***")
   if err != nil {

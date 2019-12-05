@@ -126,21 +126,21 @@ func change_dynamics(avl *Avl)(*Avl){
 }
 
 
-func (avl *Avl)insert(Data, ld, rd int) (int, int, int, *Avl){
+func (avl *Avl)insert(Data int) (int, *Avl){
   fmt.Println("--->INSERTCALLED<---", avl.Data)
   if Data < avl.Data{
     if avl.L_child == nil{
       child := Avl{Data: Data, Balance: 1, Parent: avl}
       avl.L_child = &child
       if avl.R_child == nil{
-        return avl.Balance + 2,ld, rd, avl
+        return avl.Balance + 2, avl
       }
-      return avl.Balance, ld+1,rd, avl
+      return avl.Balance, avl
     }else{
       if avl.R_child ==nil{
         avl.L_child.Balance = avl.Balance + 2
       }
-      Balance,_, _, _ := avl.L_child.insert(Data, ld, rd)
+      Balance, _ := avl.L_child.insert(Data)
       //fmt.Println("Balance: ",Balance, Data)
       if Balance == 4{
         left_rotate(avl)
@@ -159,51 +159,45 @@ func (avl *Avl)insert(Data, ld, rd int) (int, int, int, *Avl){
       //fmt.Println("Inserted to right")
       if avl.L_child == nil{
         fmt.Println("Returning with incrementing--->", avl.Balance + 3)
-        return avl.Balance + 3, ld, rd+1, avl
+        return avl.Balance + 3, avl
       }
 
       fmt.Println("Returning wihtout incrementing--->", avl.Balance)
-      return avl.Balance, ld+1, rd, avl
+      return avl.Balance, avl
     }else{
       //fmt.Println("***other_Data***", Data)
       if avl.L_child == nil{
         avl.R_child.Balance = avl.Balance + 3
       }
       fmt.Println("CAlling Insert with AVL:", avl.Data, "With R_child:", avl.R_child)
-      Balance, ld, rd, _ := avl.R_child.insert(Data, ld, rd)
+      Balance, _ := avl.R_child.insert(Data)
       //fmt.Println("Balance: ",Balance, "Data:", Data, "AVL.DATA", avl.Data)
       _, depth := depth_of_right_nodes(avl, 0)
       //fmt.Println("depth------>", depth)
       if Balance == 6{
         fmt.Println("*****Right-Rotating*****", avl.Data)
-        if rd -ld == 2{
-          if avl.L_child ==nil{
-            //fmt.Println("************INSIDE*******calling right_rotate")
-            right_rotate(avl)
-          }else{
-            root := change_dynamics(avl)
-            return 0, ld, rd, root
-          }
+        if avl.L_child ==nil{
+          //fmt.Println("************INSIDE*******calling right_rotate")
+          right_rotate(avl)
+        }else{
+          root := change_dynamics(avl)
+          return 0, root
         }
       }else if Balance == 5{
         //fmt.Println("Calling from Here***2***")
         right_left_rotate(avl)
       }else if Balance == 3 && depth == 3{
-        fmt.Println("Heloo am hererrrrrrrrrrrrrrrr", avl.Data)
-        root := &Avl{}
-        if avl.L_child == nil{
-            right_rotate(avl.R_child)
-        }else{
-          root =  change_dynamics(avl)
-        }
-        fmt.Println("Changed Root value--->", root.Data)
-        return 0, ld, rd, root
+          fmt.Println("Heloo am hererrrrrrrrrrrrrrrr", avl.Data)
+
+         root :=  change_dynamics(avl)
+         fmt.Println("Changed Root value--->", root.Data)
+         return 0, root
 
       }
 
     }
   }
-  return avl.Balance, ld, rd, avl
+  return avl.Balance, avl
 }
 
 func print_tree(t *Avl){
@@ -335,16 +329,12 @@ func (tree *Tree)Push(value int){
       }
     }
   }
-  if tree.Root.L_child != nil && tree.Root.R_child != nil{
-    _, left_depth = depth_of_left_nodes(tree.Root.L_child, 0)
-    _, right_depth = depth_of_right_nodes(tree.Root.R_child, 0)
-  }
   fmt.Println("Left depth:", left_depth, "Right DEpth:", right_depth, "*****************************************")
   //if left_depth == 0 && right_depth ==2:
 
 
   //fmt.Println("coming here")
-  _, _,_, tree.Root = tree.Root.insert(value, left_depth, right_depth)
+  _, tree.Root = tree.Root.insert(value)
   fmt.Println("//////////////************",tree.Root.Data, "***********/////////////////////")
   //fmt.Println("returning here")
   //fmt.Println(tree.Root.R_child.Data)
@@ -358,7 +348,7 @@ func producer(tree *Tree, number int){
 }
 
 func main(){
-  number := 9
+  number := 7
   tree := Tree{}
   producer(&tree, number)
   print_tree(tree.Root)

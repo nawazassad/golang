@@ -32,6 +32,7 @@ func (l *LinkedList) Push(val interface{}) {
 
 // this will pop the last element in the link list
 func (l *LinkedList) Pop() {
+  fmt.Println("popping")
 	node := l.Head
 	if l.Length == 1 {
 		l.Head = nil
@@ -39,9 +40,10 @@ func (l *LinkedList) Pop() {
 		for i := 1; i < l.Length-1; i++ {
 			node = node.Next
 		}
-    node.Next = node.Next.Next
+    node.Next = nil
 	}
 	l.Length = l.Length - 1
+  //print_ll(l)
 }
 
 func producers(l *LinkedList, number int){
@@ -50,9 +52,15 @@ func producers(l *LinkedList, number int){
   }
 }
 
-func consumers(l *LinkedList){
-  for i:=1;i>l.Length+1; i++{
+func consumers(l *LinkedList, number int){
+  for i:=1;i<number+1; i++{
     l.Pop()
+  }
+}
+
+func print_ll(l *LinkedList){
+  for node:=l.Head;node!=nil;node=node.Next{
+    fmt.Print(node.Value)
   }
 }
 
@@ -66,7 +74,7 @@ func main() {
   start := time.Now()
 
   producers(&l, number)
-  consumers(&l)
+  consumers(&l, number)
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)

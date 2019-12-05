@@ -39,6 +39,7 @@ func main() {
 	var l stack
 	var number int
 	var wg sync.WaitGroup
+
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
 

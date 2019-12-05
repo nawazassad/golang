@@ -13,6 +13,9 @@ type CircularArray struct {
 }
 
 func (c *CircularArray) Push(value int) {
+  if c.Size < c.Tail{
+    return
+  }
 	c.Tail = (c.Tail + 1) % c.Size
 	c.Queue[c.Tail] = value
 }

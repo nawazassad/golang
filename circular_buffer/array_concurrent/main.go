@@ -40,12 +40,13 @@ func producer(obj *circularArray, c1, c2 chan string) {
 	close(c1)
 }
 
-func consumer(obj *circularArray, c1, c2 chan string) {
+func consumer(obj *circularArray, c1, c2, c3 chan string) {
   for _ = range c1{
     obj.pop()
     c2 <- "consumed"
   }
   close(c2)
+  c3 <- "completed"
 }
 
 func main() {
@@ -57,10 +58,14 @@ func main() {
 
 	var c1 = make(chan string)
 	var c2 = make(chan string)
+	var c3 = make(chan string)
+
 	start := time.Now()
 	go producer(&obj, c1, c2)
-	go consumer(&obj, c1, c2)
+	go consumer(&obj, c1, c2, c3)
 
+  <- c3
+  close(c3)
 	elapsed := time.Since(start)
 	fmt.Println("Time taken is: ", elapsed)
 }

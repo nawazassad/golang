@@ -3,101 +3,113 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
-// Creating Struct for Node
-type node struct {
-	next  *node
-	value interface{}
+type Node struct {
+	Next  *Node
+	Value interface{}
 }
 
-//Creating Struct For link list
-type linkList struct {
+type circularBuffer struct {
+	Length int
+	Head   *Node
+	Tail   *Node
 	sync.Mutex
-	length int // will be used for counting the length
-	head   *node
-	tail   *node
 }
 
-//for getting the current node value
-func (n *node) Value() interface{} {
-	return n.value
+func (l *circularBuffer) Set(new_node *Node) {
+	head := l.Head
+	tail := l.Tail
+
+	new_node.Next = head
+	tail.Next = new_node
+
 }
 
-// for getting the next node
-func (n *node) Next() *node {
-	return n.next
-}
-
-// this will set the next node as current node , if its present
-func (n *node) Set(next *node) {
-	n.next = next
-}
-
-//for knowing the length of link list
-func (l *linkList) Length() int {
-	return l.length
-}
-
-// to push a new node  at the end of the link list
-func (l *linkList) Push(val interface{}, wg *sync.WaitGroup) {
+func (l *circularBuffer) Push(val interface{}, wg *sync.WaitGroup) {
+	//var wg sync.WaitGroup
 	defer wg.Done()
 	l.Lock()
 	defer l.Unlock()
-	n := &node{value: val}
+	n := &Node{Value: val}
 
-	if l.head == nil {
-		l.head = n
+	if l.Head == nil {
+		l.Head = n
 	} else {
-		l.tail.Set(n)
+		l.Set(n)
+		// l.Unlock()
 	}
-	l.tail = n
-	l.length = l.length + 1
-	//fmt.Printf("%+v ", l.Value())
-	l.Print()
-	//l.Unlock()
+
+	l.Tail = n
+	l.Length = l.Length + 1
+	fmt.Printf("%+v ", n.Value)
+	//fmt.Print("\n", n.Value)
+	//wg.Done()
 }
 
-// this will pop the last element in the link list
-func (l *linkList) Pop(wg *sync.WaitGroup) {
+func (l *circularBuffer) Pop(wg *sync.WaitGroup) {
+	//var wg sync.WaitGroup
 	defer wg.Done()
 	l.Lock()
 	defer l.Unlock()
-	node := l.head
-	if l.Length() == 1 {
-		l.head = nil
-	} else {
-		for i := 1; i < l.Length()-1; i++ {
-			node = node.Next()
-		}
-		node.Set(node.Next().Next())
+
+	if l.Length == 0 {
+		return
 	}
-	l.length = l.length - 1
-	l.Print()
+
+	l.Head = l.Head.Next
+	l.Tail.Next = l.Head
+	l.Length = l.Length - 1
+
+	//l.Print()
+	// for node := l.Head; node != nil; node = node.Next {
+	// 	fmt.Printf("%+v ", node.Value)
+	// }
 }
 
-// for printing the link list
-func (l *linkList) Print() {
-	if l.head != nil {
+func (l *circularBuffer) Print() {
+	if l.Head != nil {
 		//fmt.Printf("List elements: ")
-		for node := l.head; node != nil; node = node.Next() {
-			fmt.Printf("%+v ", node.Value())
+		for node := l.Head; node != nil; node = node.Next {
+			fmt.Printf("%+v ", node.Value)
 		}
 		fmt.Println()
 	}
 }
 
+// func Producers(cb *circularBuffer, number int, wg *sync.WaitGroup) {
+// 	defer wg.Done()
+// 	cb.Lock()
+// 	defer cb.Unlock()
+// 	for i := 0; i < number+1; i++ {
+// 		fmt.Println("pushing", i)
+// 		cb.Push(i)
+// 	}
+
+// }
+
+// func Consumers(cb *circularBuffer, number int) {
+// 	for i := 0; i < number+1; i++ {
+
+// 		cb.Pop()
+// 	}
+// }
+
 func main() {
-	var l linkList
-	var wg sync.WaitGroup
+	var l circularBuffer
 	var number int
+	var wg sync.WaitGroup
 	fmt.Println("Enter the number of producers you want: ")
 	fmt.Scanf("%d", &number)
+
+	start := time.Now()
 	wg.Add(number)
-	fmt.Println("Now we Produce :")
-	for i := 1; i < number+1; i++ {
-		// for checking if there is race condition we use below go l.Push()
-		//go l.Push(i)
+
+	fmt.Println("Now we push:")
+	//go Producers(&l, number, &wg)
+	for i := 1; i <= number; i++ {
+		//fmt.Println(i)
 		go l.Push(i, &wg)
 		//l.Print()
 	}
@@ -105,19 +117,22 @@ func main() {
 
 	wg.Add(number)
 	fmt.Println("Now we Consume:")
-	l.Print()
-	for k := 1; k < number+1; k++ {
+	//l.Print()
+	for k := 1; k <= number; k++ {
 		// for checking if there is race condition we use below go l.Pop()
 		//go l.Pop()
+		// fmt.Println(k)
 		go l.Pop(&wg)
+
 		//l.Print()
 	}
-	wg.Wait()
-	fmt.Println("Linked List is empty ")
+	// fmt.Println(l.Head.Value)
+	// wg.Wait()
+	// wg.Add(number)
+	//go consumers(&l, number)
+	//wg.Wait()
 	//l.Print()
-
-	//fmt.Printf("linked list took %s", elapsed)
-	fmt.Println("")
-	fmt.Println("")
+	elapsed := time.Since(start)
+	fmt.Println("Time taken is: ", elapsed)
 
 }

@@ -248,7 +248,6 @@ func remove(node *Avl){
   }
 
 }
-// expected output--> 11, 23, 29, 26, 20, 50, 65, 55, 41
 ///* left rotate example
 func main(){
   var a = Avl{data: 41}
@@ -266,7 +265,6 @@ func main(){
 }
 //*/
 
-// expected output--> 20, 55, 70, 65, 41
 /* right rotate example
 func main(){
   var a = Avl{data: 41}
@@ -283,21 +281,12 @@ func main(){
 */
 
 
-// expected output--> 11, 23, 29, 26, 20, 50, 65, 50, 41
 /*left right rotate example
 func main(){
   var a = Avl{data: 41}
   insert(&a, 20)
   a.balance = 0
   insert(&a, 65)
-  a.balance = 0
-  insert(&a, 11)
-  a.balance = 0
-  insert(&a, 26)
-  a.balance = 0
-  insert(&a, 23)
-  a.balance = 0
-  insert(&a, 29)
   a.balance = 0
   insert(&a, 50)
   a.balance = 0
@@ -308,7 +297,6 @@ func main(){
 */
 
 
-// expected output-->11, 23, 29, 26, 20, 65, 70, 66, 41
 /* right left roatate example
 func main(){
   var a = Avl{data: 41}
@@ -320,13 +308,11 @@ func main(){
   a.balance = 0
   insert(&a, 26)
   a.balance = 0
-  insert(&a, 23)
+  insert(&a, 27)
   a.balance = 0
-  insert(&a, 29)
+  insert(&a, 21)
   a.balance = 0
   insert(&a, 70)
-  a.balance = 0
-  insert(&a, 66)
   a.balance = 0
   print_tree(&a)
 }

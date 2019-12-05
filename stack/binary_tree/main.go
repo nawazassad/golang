@@ -13,8 +13,6 @@ type Tree struct{
 type Node struct{
   Value interface{}
   Link [2]*Node
-  Parent  *Node
-  Count int
 }
 
 func insert_to_left(node *Node, value int){
@@ -42,12 +40,10 @@ func (node *Node)insert(value int){
   //fmt.Println("----Inserting----", node.Value)
 
   if node.Link[0] == nil{
-    //node.Link[0] = &Node{Value: value, Parent: node}
     node.Link[0] = &Node{Value: value}
     //fmt.Println("----Returning----")
     return
   }else if node.Link[1] == nil{
-    //node.Link[1] = &Node{Value: value, Parent: node}
     node.Link[1] = &Node{Value: value}
     return
   }
@@ -212,6 +208,7 @@ func consumers(tree *Tree, number int){
 func main(){
   tree := Tree{}
 
+/*
   var number int
   fmt.Println("Enter the number of producers you want: ")
   fmt.Scanf("%d", &number)
@@ -226,19 +223,27 @@ func main(){
   }
   fmt.Printf("%s\n", data)
   consumers(&tree, number)
+  data, err = json.MarshalIndent(tree, "", "  ")
+  //fmt.Println("***Pavilion***")
+  if err != nil {
+    log.Fatal(err)
+  }
+  fmt.Printf("%s\n", data)
 
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
 
 }
-/*
+*/
+
+
   start := time.Now()
   tree.Push(1)
   tree.Push(2)
   tree.Push(3)
-  //tree.Push(4)
-  //tree.Push(5)
-  //tree.Push(6)
+  tree.Push(4)
+  tree.Push(5)
+  tree.Push(6)
   //tree.Push(7)
   //tree.push(8)
   fmt.Println("***Pavilion***")
@@ -248,7 +253,7 @@ func main(){
     log.Fatal(err)
   }
   fmt.Printf("%s\n", data)
-
+/*
   tree.Pop()
   tree.Pop()
   tree.Pop()
@@ -260,8 +265,11 @@ func main(){
     log.Fatal(err)
   }
   fmt.Printf("%s\n", data)
+*/
+
   elapsed := time.Since(start)
   fmt.Println("Time taken is: ", elapsed)
 }
 
-*/
+
+
